@@ -1,0 +1,16 @@
+[package]
+name = "gothmog"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = "1.0.228"
+serde_json = "1.0.149"
+solana-address = "2.5.0"
+solana-client = "3.1.11"
+solana-sdk = "3.0.0"
+solana-system-interface = { version = "3.1.0", features = ["bincode"]}
+solana-system-transaction = "4.0.0"
+spl-associated-token-account = "8.0.0"
+spl-token-2022-interface = "2.1.0"
+spl-token-interface = "2"
