@@ -6,14 +6,17 @@ import { useWallet } from '@solana/wallet-adapter-react';
 
 interface props {
     tokens: Record<string, Token>
+    selectedToken: Token | null
+    onSelect: (token: Token) => void
 }
 
-function TokenList({ tokens }: props) {
+function TokenList({ tokens, selectedToken, onSelect }: props) {
     const [search, setSearch] = useState("");
 
-    const filteredTokens = Object.entries(tokens).filter(([_, token]) =>
-        token.name.toLowerCase().includes(search.toLowerCase()) ||
-        token.mint.toLowerCase().includes(search.toLowerCase())
+    const filteredTokens = Object.entries(tokens).filter(([key, token]) =>
+        key !== "USDC" &&
+        (token.name.toLowerCase().includes(search.toLowerCase()) ||
+        token.mint.toLowerCase().includes(search.toLowerCase()))
     );
 
     const balances = useTokenBalances(tokens);
@@ -36,11 +39,12 @@ function TokenList({ tokens }: props) {
                 {filteredTokens.map(([key, token]) => (
                     <ListItem
                         key={key}
+                        onClick={() => onSelect(token)}
                         sx={{
-                            background: "#333",
+                            background: selectedToken?.mint === token.mint ? "#1a4a3a" : "#333",
                             borderRadius: 1,
                             cursor: "pointer",
-                            "&:hover": { background: "#444" },
+                            "&:hover": { background: selectedToken?.mint === token.mint ? "#1a4a3a" : "#444" },
                         }}
                     >
                         <ListItemText

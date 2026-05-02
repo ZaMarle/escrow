@@ -1,0 +1,58 @@
+use std::{collections::HashMap, fs};
+
+use solana_client::rpc_client::RpcClient;
+use solana_sdk::{program_pack::Pack, signature::Keypair, signer::Signer};
+use solana_system_interface::instruction;
+
+use crate::token::Token;
+
+pub fn create_usdc(rpc: &RpcClient, creator: &Keypair) -> Keypair {
+    let usdc_mint = Keypair::new();
+    let decimals = 6;
+    let token = Token {
+        decimals,
+        name: "USDC".to_string(),
+        mint: usdc_mint.pubkey().to_string(),
+    };
+    let mut tokens: HashMap<String, Token> =
+        serde_json::from_str(&fs::read_to_string("db/tokens.json").unwrap()).unwrap();
+    tokens.insert("USDC".to_string(), token);
+    fs::write(
+        "db/tokens.json",
+        serde_json::to_string_pretty(&tokens).unwrap(),
+    )
+    .unwrap();
+
+    let rent = rpc
+        .get_minimum_balance_for_rent_exemption(spl_token_interface::state::Mint::LEN)
+        .unwrap();
+
+    let create_ix = instruction::create_account(
+        &creator.pubkey(),
+        &usdc_mint.pubkey(),
+        rent,
+        spl_token_interface::state::Mint::LEN as u64,
+        &solana_address::Address::from(spl_token_interface::id()),
+    );
+
+    let init_ix = spl_token_interface::instruction::initialize_mint(
+        &spl_token_interface::id(),
+        &usdc_mint.pubkey(),
+        &creator.pubkey(),
+        None,
+        decimals,
+    )
+    .unwrap();
+
+    println!("Create USDC");
+    let tx = solana_sdk::transaction::Transaction::new_signed_with_payer(
+        &[create_ix, init_ix],
+        Some(&creator.pubkey()),
+        &[&creator, &usdc_mint],
+        rpc.get_latest_blockhash().unwrap(),
+    );
+
+    rpc.send_and_confirm_transaction(&tx).unwrap();
+
+    usdc_mint
+}

@@ -1,16 +1,18 @@
 use std::{collections::HashMap, fs};
 
 use solana_client::rpc_client::RpcClient;
-use solana_sdk::{bs58, signature::Keypair, signer::Signer};
 
 use crate::{
-    create_bananacoin::create_bananacoin, fund_alice_appletoken::fund_alice_appletoken,
-    fund_bob_bananatoken::fund_bob_bananatoken, wallet::Wallet,
+    create_bananacoin::create_bananacoin, create_usdc::create_usdc,
+    fund_alice_appletoken::fund_alice_appletoken, fund_bob_bananatoken::fund_bob_bananatoken,
+    fund_usdc::fund_usdc, wallet::Wallet,
 };
 mod create_applecoin;
 mod create_bananacoin;
+mod create_usdc;
 mod fund_alice_appletoken;
 mod fund_bob_bananatoken;
+mod fund_usdc;
 mod token;
 mod wallet;
 
@@ -74,11 +76,17 @@ fn main() {
 
     let apple_mint = create_applecoin::create_applecoin(&rpc, &sauron.keypair());
     let banana_mint = create_bananacoin(&rpc, &sauron.keypair());
+    let usdc_mint = create_usdc(&rpc, &sauron.keypair());
 
     let alice_apple_ata =
         fund_alice_appletoken(&rpc, &alice.keypair(), &apple_mint, &sauron.keypair());
     let bob_banana_ata =
         fund_bob_bananatoken(&rpc, &bob.keypair(), &banana_mint, &sauron.keypair());
+
+    println!("Fund alice with USDC");
+    let alice_usdc_ata = fund_usdc(&rpc, &alice.keypair(), &usdc_mint, &sauron.keypair(), 100);
+    println!("Fund bob with USDC");
+    let bob_usdc_ata = fund_usdc(&rpc, &bob.keypair(), &usdc_mint, &sauron.keypair(), 100);
 
     // Log state of alice account (all tokens owned)
     println!("Get alice applecoins");
@@ -95,6 +103,12 @@ fn main() {
         "Bob has a balance of {} banana tokens",
         bob_bananatokens.unwrap().amount
     );
+
+    let alice_usdc = rpc.get_token_account_balance(&alice_usdc_ata).unwrap();
+    println!("Alice has {} USDC", alice_usdc.ui_amount_string);
+
+    let bob_usdc = rpc.get_token_account_balance(&bob_usdc_ata).unwrap();
+    println!("Bob has {} USDC", bob_usdc.ui_amount_string);
 }
 
 // // 1. Setup in-memory validator

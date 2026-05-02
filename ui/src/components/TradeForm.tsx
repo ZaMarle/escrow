@@ -58,22 +58,6 @@ export default function TradeForm() {
         </Button>
     </Box>
 
-      {/* Amount */}
-      <Controller
-        name="amount"
-        control={control}
-        rules={{ required: true, min: 0 }}
-        render={({ field }) => (
-          <TextField
-            {...field}
-            label="Amount"
-            type="number"
-            fullWidth
-            size="small"
-          />
-        )}
-      />
-
       {/* Price */}
       <Controller
         name="price"
@@ -83,6 +67,22 @@ export default function TradeForm() {
           <TextField
             {...field}
             label="Price"
+            type="number"
+            fullWidth
+            size="small"
+          />
+        )}
+      />
+
+      {/* Amount */}
+      <Controller
+        name="amount"
+        control={control}
+        rules={{ required: true, min: 0 }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Amount"
             type="number"
             fullWidth
             size="small"

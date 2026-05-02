@@ -182,3 +182,30 @@
     border-right-color: var(--border);
   }
 }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.wallet-adapter-button {
+  background-color: #22ffc8 !important;
+  color: #0a0b0f !important;
+  border: none !important;
+  font-family: inherit !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+.wallet-adapter-button:hover:not([disabled]) {
+  background-color: #1ae6b4 !important;
+}
+
+.wallet-adapter-button-trigger {
+  background-color: #22ffc8 !important;
+}
